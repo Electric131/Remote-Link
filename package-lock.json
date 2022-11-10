@@ -1,0 +1,15 @@
+{
+    "name": "middleman",
+    "version": "1.0.0",
+    "description": "",
+    "main": "middleman.js",
+    "scripts": {
+      "start": "node middleman.js"
+    },
+    "keywords": [],
+    "author": "",
+    "dependencies": {
+      "express": "^4.17.3",
+      "ws": "^8.5.0"
+    }
+  }
