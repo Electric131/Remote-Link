@@ -1,9 +1,6 @@
 import asyncio
 import websockets
 
-PublicIP = "47.222.105.250"
-print("Server running on " + PublicIP)
-
 async def handler(websocket):
     while True:
         try:
@@ -13,8 +10,9 @@ async def handler(websocket):
         print(message)
 
 async def main():
-    async with websockets.serve(handler, PublicIP, 28567):
-        await asyncio.Future()
+    async with websockets.connect("wss://remote-connections-klmik.ondigitalocean.app") as websocket:
+        while True:
+            print(await websocket.recv())
     
 if __name__ == "__main__":
     asyncio.run(main())
