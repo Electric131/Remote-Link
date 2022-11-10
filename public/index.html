@@ -51,6 +51,7 @@
 
         // will not use tls if the connection is not made over https
         const protocol = window.location.protocol.includes('https') ? 'wss': 'ws'
+        alert(`${protocol}://${location.host}`)
         const ws = new WebSocket(`${protocol}://${location.host}`);
 
 
