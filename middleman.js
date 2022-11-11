@@ -28,7 +28,7 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
-        new WebSocketServer({server: 8080, path: req.url})
+        new WebSocketServer({server: server, path: req.url})
         console.log(message)
         console.log(req.url)
     });
