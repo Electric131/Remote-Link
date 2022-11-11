@@ -23,7 +23,10 @@ wss.on('connection', function (ws, req) {
     console.log('Client connected.');
     console.log("Path: " + req.url);
     console.log("Connected Client Count: " + wss.clients.size);
-    console.log("Connected Clients: " + wss.clients.values());
+    console.log("Connected Clients: ");
+    for (const item of wss.clients) {
+        console.log(item)
+    }
 
     ws.on('close', function () {
         console.log('Client disconnected.');
