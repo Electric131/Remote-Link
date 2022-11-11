@@ -16,7 +16,7 @@ app.get('*', function (req, res) {
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
-wss.on('connection', function (ws) {
+wss.on('connection', function (ws, req) {
     const id = setInterval(function () {
     // ws.send(JSON.stringify(process.memoryUsage()), function () {
     //   //
@@ -25,7 +25,7 @@ wss.on('connection', function (ws) {
     // });
     }, 100);
     console.log('started client interval');
-    console.log(ws.upgradeReq.url)
+    console.log(req.url)
 
     ws.on('close', function () {
         console.log('stopping client interval');
