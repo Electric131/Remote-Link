@@ -5,6 +5,7 @@ const path = require('path');
 const { createServer } = require('http');
 
 const WebSocket = require('ws');
+const { WebSocketServer } = require('ws');
 
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
@@ -17,13 +18,6 @@ const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function (ws, req) {
-    const id = setInterval(function () {
-    // ws.send(JSON.stringify(process.memoryUsage()), function () {
-    //   //
-    //   // Ignoring errors.
-    //   //
-    // });
-    }, 100);
     console.log('started client interval');
     console.log(req.url)
 
@@ -34,6 +28,7 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
+        new WebSocketServer({server: 8080, path: req.url})
         console.log(message)
         console.log(req.url)
     });
