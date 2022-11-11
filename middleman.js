@@ -18,11 +18,11 @@ const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function (ws) {
   const id = setInterval(function () {
-    ws.send(JSON.stringify(process.memoryUsage()), function () {
-      //
-      // Ignoring errors.
-      //
-    });
+    // ws.send(JSON.stringify(process.memoryUsage()), function () {
+    //   //
+    //   // Ignoring errors.
+    //   //
+    // });
   }, 100);
   console.log('started client interval');
 
