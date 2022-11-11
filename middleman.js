@@ -23,9 +23,10 @@ wss.on('connection', function (ws, req) {
     console.log('Client connected.');
     console.log("Path: " + req.url);
     console.log("Connected Client Count: " + wss.clients.size);
-    console.log("Connected Clients: ");
-    for (const item of wss.clients) {
-        console.log(item)
+
+    if (!req.url.startsWith("/server/")) {
+        ws.close()
+        return
     }
 
     ws.on('close', function () {
