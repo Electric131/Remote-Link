@@ -35,6 +35,7 @@ wss.on('connection', function (ws, req) {
     ws.on('message', function(message) {
         message = message.toString()
         console.log(message)
+        console.log(req.url)
     });
 });
 
