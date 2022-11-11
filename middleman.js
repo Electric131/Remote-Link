@@ -24,7 +24,7 @@ wss.on('connection', function (ws, req) {
     console.log("Path: " + req.url);
     console.log("Connected Client Count: " + wss.clients.size);
 
-    if (!req.url.startsWith("/server/*")) {
+    if (!/\/server\/\d+\/\S+/.test(req.url)) {
         ws.close()
         return
     }
