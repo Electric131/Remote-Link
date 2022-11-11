@@ -9,6 +9,10 @@ const WebSocket = require('ws');
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
 
+app.get('*', function (req, res) {
+    res.redirect("/")
+})
+
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
