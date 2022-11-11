@@ -17,19 +17,23 @@ const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function (ws) {
-  const id = setInterval(function () {
+    const id = setInterval(function () {
     // ws.send(JSON.stringify(process.memoryUsage()), function () {
     //   //
     //   // Ignoring errors.
     //   //
     // });
-  }, 100);
-  console.log('started client interval');
+    }, 100);
+    console.log('started client interval');
 
-  ws.on('close', function () {
-    console.log('stopping client interval');
-    clearInterval(id);
-  });
+    ws.on('close', function () {
+        console.log('stopping client interval');
+        clearInterval(id);
+    });
+
+    ws.on('data', function(data) {
+        console.log(data)
+    });
 });
 
 server.listen(8080, function () {
