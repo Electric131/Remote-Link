@@ -17,13 +17,16 @@ app.get('*', function (req, res) {
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
+var connections = {}
+
 wss.on('connection', function (ws, req) {
-    console.log('started client interval');
-    console.log(req.url)
+    console.log('Client connected.');
+    console.log("Path: " + req.url);
+    console.log("Connected Client Count: " + wss.clients.size);
+    console.log("Connected Clients: " + JSON.stringify(wss.clients));
 
     ws.on('close', function () {
-        console.log('stopping client interval');
-        clearInterval(id);
+        console.log('Client disconnected.');
     });
 
     ws.on('message', function(message) {
