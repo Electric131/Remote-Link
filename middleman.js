@@ -28,7 +28,8 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
-        new WebSocketServer({server: server, path: req.url})
+        // new WebSocketServer({server: server, path: req.url})
+        ws.send("Test message!")
         console.log(message)
         console.log(req.url)
     });
