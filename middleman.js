@@ -31,8 +31,9 @@ wss.on('connection', function (ws) {
         clearInterval(id);
     });
 
-    ws.on('data', function(data) {
-        console.log(data)
+    ws.on('message', function(messageString) {
+        const message =JSON.parse(messageString)
+        console.log(message)
     });
 });
 
