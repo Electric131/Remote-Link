@@ -38,10 +38,18 @@ wss.on('connection', function (ws, req) {
     connections[id].push(ws)
     
     console.log("Client connected to room #" + id);
-    console.log("Password used: " + password)
+    console.log("Room #" + id + " now has " + connections[id].length + " connections")
 
     ws.on('close', function () {
-        console.log('Client disconnected.');
+        connections[id] = connections[id].filter(e => e !== 'seven')
+        if (connections[id].length == 0) {
+            delete connections[id]
+        }
+        console.log("Client disconnected from room #" + id);
+        if (id in connections) {
+            console.log("Room #" + id + " now has " + connections[id].length + " connections")
+        } else {
+            console.log("Room #" + id + " now has 0 connections")
     });
 
     ws.on('message', function(message) {
@@ -51,8 +59,6 @@ wss.on('connection', function (ws, req) {
                 socket.send(message)
             }
         }
-        console.log(id)
-        console.log(message)
     });
 });
 
