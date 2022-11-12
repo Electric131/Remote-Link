@@ -24,10 +24,14 @@ wss.on('connection', function (ws, req) {
     console.log("Path: " + req.url);
     console.log("Connected Client Count: " + wss.clients.size);
 
-    if (!/\/server\/\d+\/\S+/.test(req.url)) {
+    if (!/^\/server\/\d+\/[^\s^\/]+\/?$/.test(req.url)) {
         ws.close()
         return
     }
+    
+    const groups = req.url.match(/^\/server\/(\d+)\/([^\s^\/]+)\/?$/)
+    const id = groups[1]
+    const password = groups[2]
 
     ws.on('close', function () {
         console.log('Client disconnected.');
