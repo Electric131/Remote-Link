@@ -53,7 +53,7 @@ wss.on('connection', function (ws, req) {
         return
     }
     
-    if (rooms[id].length == 0) {
+    if (Object.keys(rooms[id]).length == 0) {
         console.log("Room #" + id + " host connected")
         rooms[id].password = password
         rooms[id].host = ws
