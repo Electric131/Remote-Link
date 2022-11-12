@@ -54,7 +54,6 @@ wss.on('connection', function (ws, req) {
     }
     
     if (Object.keys(rooms[id]).length == 0) {
-        console.log("Room #" + id + " host connected")
         rooms[id].password = password
         rooms[id].host = ws
     }
@@ -63,8 +62,6 @@ wss.on('connection', function (ws, req) {
         connections[id] = []
     }
     connections[id].push({socket: ws, valid: password == rooms[id].password})
-    
-    console.log("Client connected to room #" + id);
 
     ws.on('close', function () {
         connections[id] = connections[id].filter(socketData => socketData.socket !== ws)
