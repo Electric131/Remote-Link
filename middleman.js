@@ -39,7 +39,6 @@ wss.on('connection', function (ws, req) {
     
     console.log("Client connected to room #" + id);
     console.log("Password used: " + password)
-    console.log(connections[id])
 
     ws.on('close', function () {
         console.log('Client disconnected.');
@@ -48,8 +47,9 @@ wss.on('connection', function (ws, req) {
     ws.on('message', function(message) {
         message = message.toString()
         for (const socket of connections[id]) {
-            console.log(socket)
-            socket.send(message)
+            if (socket != ws) {
+                socket.send(message)
+            }
         }
         console.log(id)
         console.log(message)
