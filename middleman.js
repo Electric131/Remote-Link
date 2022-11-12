@@ -10,6 +10,9 @@ const { WebSocketServer } = require('ws');
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
 
+var connections = {}
+var rooms = {}
+
 app.all('*', function (req, res) {
     if (req.url == "/newRoom/") {
         var nextRoom = 1
@@ -20,7 +23,12 @@ app.all('*', function (req, res) {
             }
             break
         }
+        room[nextRoom.toString()] = {}
         res.send(nextRoom.toString())
+        setTimeout(function(id) {
+            console.log(JSON.stringify(rooms[id]))
+            delete rooms[id]
+        }, 10000, nextRoom.toString())
         return
     }
     res.redirect("/")
@@ -29,11 +37,9 @@ app.all('*', function (req, res) {
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
-var connections = {}
-var rooms = {}
-
 wss.on('connection', function (ws, req) {
     if (!/^\/room\/\d+\/[^\s^\/]+\/?$/.test(req.url)) {
+        ws.send("Invalid connection format.")
         ws.close()
         return
     }
@@ -41,6 +47,18 @@ wss.on('connection', function (ws, req) {
     const groups = req.url.match(/^\/room\/(\d+)\/([^\s^\/]+)\/?$/)
     const id = groups[1]
     const password = groups[2]
+    
+    if (!id in rooms) {
+        ws.send("Invalid room")
+        ws.close()
+        return
+    }
+    
+    if (rooms[id].length = 0) {
+        console.log("Room #" + id + " host connected")
+        rooms[id].password = password
+        rooms[id].host = ws
+    }
     
     if (!(id in connections)) {
         connections[id] = []
