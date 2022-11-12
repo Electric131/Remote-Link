@@ -26,7 +26,6 @@ app.all('*', function (req, res) {
         rooms[nextRoom.toString()] = {}
         res.send(nextRoom.toString())
         setTimeout(function(id) {
-            console.log(JSON.stringify(rooms[id]))
             delete rooms[id]
         }, 10000, nextRoom.toString())
         return
@@ -54,7 +53,7 @@ wss.on('connection', function (ws, req) {
         return
     }
     
-    if (rooms[id].length = 0) {
+    if (rooms[id].length == 0) {
         console.log("Room #" + id + " host connected")
         rooms[id].password = password
         rooms[id].host = ws
