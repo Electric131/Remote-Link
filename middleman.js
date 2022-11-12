@@ -39,6 +39,7 @@ wss.on('connection', function (ws, req) {
     
     console.log("Client connected to room #" + id);
     console.log("Password used: " + password)
+    console.log(connections[id])
 
     ws.on('close', function () {
         console.log('Client disconnected.');
