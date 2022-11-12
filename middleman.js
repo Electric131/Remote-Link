@@ -18,9 +18,9 @@ app.all('*', function (req, res) {
                 nextRoom ++;
                 continue
             }
-            res.send("<p>" + nextRoom + "</p>")
             break
         }
+        res.send("<p>" + nextRoom + "</p>")
         return
     }
     res.redirect("/")
