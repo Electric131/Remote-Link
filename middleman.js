@@ -11,8 +11,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
 
 app.all('*', function (req, res) {
-    console.log(res.url)
-    if (res.url == "/newRoom/") {
+    if (req.url == "/newRoom/") {
         var nextRoom = 1
         for (const roomID of Object.keys(rooms)) {
             if (roomID == nextRoom) {
