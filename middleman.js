@@ -40,7 +40,6 @@ const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function (ws, req) {
     if (!/^\/room\/\d+\/[^\s^\/]+\/?$/.test(req.url)) {
-        ws.send("Invalid connection format.")
         ws.close()
         return
     }
@@ -50,7 +49,6 @@ wss.on('connection', function (ws, req) {
     const password = groups[2]
     
     if (!id in rooms) {
-        ws.send("Invalid room")
         ws.close()
         return
     }
@@ -67,18 +65,16 @@ wss.on('connection', function (ws, req) {
     connections[id].push({socket: ws, valid: password == rooms[id].password})
     
     console.log("Client connected to room #" + id);
-    console.log("Room #" + id + " now has " + connections[id].length + " connections")
 
     ws.on('close', function () {
         connections[id] = connections[id].filter(socketData => socketData.socket !== ws)
         if (connections[id].length == 0) {
             delete connections[id]
         }
-        console.log("Client disconnected from room #" + id);
-        if (id in connections) {
-            console.log("Room #" + id + " now has " + connections[id].length + " connections")
-        } else {
-            console.log("Room #" + id + " now has 0 connections")
+        if (ws == room[id].host) {
+            for (const socketData of connections[id]) {
+                socketData.socket.close()
+            }
         }
     });
 
