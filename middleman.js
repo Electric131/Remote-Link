@@ -43,6 +43,7 @@ wss.on('connection', function (ws, req) {
         message = message.toString()
         // new WebSocketServer({server: server, path: req.url})
         ws.send("Test message!")
+        console.log(id)
         console.log(message)
         console.log(req.url)
     });
