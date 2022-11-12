@@ -11,20 +11,19 @@ const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
 
 app.all('*', function (req, res) {
-    res.redirect("/")
-})
-
-app.get('/newServer/', function(req, res) {
-    var nextRoom = 1
-    for (const roomID of Object.keys(rooms)) {
-        if (roomID == nextRoom) {
-            nextRoom ++;
-            continue
+    if (res.url == "/newRoom/") {
+        var nextRoom = 1
+        for (const roomID of Object.keys(rooms)) {
+            if (roomID == nextRoom) {
+                nextRoom ++;
+                continue
+            }
+            res.send("<p>" + nextRoom + "</p>")
+            break
         }
-        res.send("<p>" + nextRoom + "</p>")
-        break
+        return
     }
-    return
+    res.redirect("/")
 })
 
 const server = createServer(app);
