@@ -48,7 +48,7 @@ wss.on('connection', function (ws, req) {
     const id = groups[1]
     const password = groups[2]
     
-    if (!id in rooms) {
+    if (!(id in rooms)) {
         ws.close()
         return
     }
