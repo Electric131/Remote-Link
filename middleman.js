@@ -32,6 +32,11 @@ wss.on('connection', function (ws, req) {
     const id = groups[1]
     const password = groups[2]
     
+    if (!(id in connections)) {
+        connections[id] = []
+    }
+    connections[id].push(ws)
+    
     console.log("Client connected to room #" + id);
     console.log("Password used: " + password)
 
@@ -41,11 +46,11 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
-        // new WebSocketServer({server: server, path: req.url})
-        ws.send("Test message!")
+        for (socket in connections[id]) {
+            socket.send(message)
+        }
         console.log(id)
         console.log(message)
-        console.log(req.url)
     });
 });
 
