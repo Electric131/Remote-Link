@@ -10,19 +10,30 @@ const { WebSocketServer } = require('ws');
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
 
-app.get('*', function (req, res) {
+app.all('*', function (req, res) {
     res.redirect("/")
+})
+
+app.get('/newServer/', function(req, res) {
+    var nextRoom = 1
+    for (const roomID of Object.keys(rooms)) {
+        if (roomID == nextRoom) {
+            nextRoom ++;
+            continue
+        }
+        res.send("<p>" + nextRoom + "</p>")
+        break
+    }
+    return
 })
 
 const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 
 var connections = {}
+var rooms = {}
 
 wss.on('connection', function (ws, req) {
-    console.log('Client connecting to room.');
-    console.log("Path: " + req.url);
-
     if (!/^\/room\/\d+\/[^\s^\/]+\/?$/.test(req.url)) {
         ws.close()
         return
@@ -35,13 +46,13 @@ wss.on('connection', function (ws, req) {
     if (!(id in connections)) {
         connections[id] = []
     }
-    connections[id].push(ws)
+    connections[id].push({socket: ws, valid: password == rooms[id].password})
     
     console.log("Client connected to room #" + id);
     console.log("Room #" + id + " now has " + connections[id].length + " connections")
 
     ws.on('close', function () {
-        connections[id] = connections[id].filter(e => e !== ws)
+        connections[id] = connections[id].filter(socketData => socketData.socket !== ws)
         if (connections[id].length == 0) {
             delete connections[id]
         }
@@ -55,9 +66,9 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
-        for (const socket of connections[id]) {
-            if (socket != ws) {
-                socket.send(message)
+        for (const socketData of connections[id]) {
+            if (socketData.socket != ws && socketData.valid) {
+                socketData.socket.send(message)
             }
         }
     });
