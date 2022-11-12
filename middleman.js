@@ -23,7 +23,7 @@ app.all('*', function (req, res) {
             }
             break
         }
-        room[nextRoom.toString()] = {}
+        rooms[nextRoom.toString()] = {}
         res.send(nextRoom.toString())
         setTimeout(function(id) {
             console.log(JSON.stringify(rooms[id]))
