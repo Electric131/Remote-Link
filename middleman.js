@@ -50,6 +50,7 @@ wss.on('connection', function (ws, req) {
             console.log("Room #" + id + " now has " + connections[id].length + " connections")
         } else {
             console.log("Room #" + id + " now has 0 connections")
+        }
     });
 
     ws.on('message', function(message) {
