@@ -26,10 +26,9 @@ app.all('*', function (req, res) {
         rooms[nextRoom.toString()] = {}
         res.send(nextRoom.toString())
         setTimeout(function(id) {
-            console.log(id)
-            console.log(JSON.stringify(rooms))
-            delete rooms[id]
-            console.log(JSON.stringify(rooms))
+            if (Object.keys(rooms[id]) == 0) {
+                delete rooms[id]
+            }
         }, 10000, nextRoom.toString())
         return
     }
