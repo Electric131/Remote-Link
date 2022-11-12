@@ -20,7 +20,7 @@ app.all('*', function (req, res) {
             }
             break
         }
-        res.send("<p>" + nextRoom + "</p>")
+        res.send(nextRoom)
         return
     }
     res.redirect("/")
