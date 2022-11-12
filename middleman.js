@@ -20,18 +20,20 @@ const wss = new WebSocket.Server({ server });
 var connections = {}
 
 wss.on('connection', function (ws, req) {
-    console.log('Client connected.');
+    console.log('Client connecting to room.');
     console.log("Path: " + req.url);
-    console.log("Connected Client Count: " + wss.clients.size);
 
-    if (!/^\/server\/\d+\/[^\s^\/]+\/?$/.test(req.url)) {
+    if (!/^\/room\/\d+\/[^\s^\/]+\/?$/.test(req.url)) {
         ws.close()
         return
     }
     
-    const groups = req.url.match(/^\/server\/(\d+)\/([^\s^\/]+)\/?$/)
+    const groups = req.url.match(/^\/room\/(\d+)\/([^\s^\/]+)\/?$/)
     const id = groups[1]
     const password = groups[2]
+    
+    console.log("Client connected to room #" + id);
+    console.log("Password used: " + password)
 
     ws.on('close', function () {
         console.log('Client disconnected.');
