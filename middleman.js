@@ -47,7 +47,7 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
-        for (const socket in connections[id]) {
+        for (const socket of connections[id]) {
             console.log(socket)
             socket.send(message)
         }
