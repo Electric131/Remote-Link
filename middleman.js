@@ -41,7 +41,7 @@ wss.on('connection', function (ws, req) {
     console.log("Room #" + id + " now has " + connections[id].length + " connections")
 
     ws.on('close', function () {
-        connections[id] = connections[id].filter(e => e !== 'seven')
+        connections[id] = connections[id].filter(e => e !== ws)
         if (connections[id].length == 0) {
             delete connections[id]
         }
