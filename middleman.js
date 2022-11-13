@@ -68,7 +68,7 @@ wss.on('connection', function (ws, req) {
         if (connections[id].length == 0) {
             delete connections[id]
         }
-        if (ws == rooms[id].host) {
+        if (id in rooms && ws == rooms[id].host) {
             delete rooms[id]
             for (const socketData of connections[id]) {
                 socketData.socket.close()
