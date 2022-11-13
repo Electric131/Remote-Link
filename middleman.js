@@ -26,10 +26,10 @@ app.all('*', function (req, res) {
         rooms[nextRoom.toString()] = {}
         res.send(nextRoom.toString())
         setTimeout(function(id) {
-            if (Object.keys(rooms[id]) == 0) {
+            if (id in rooms && Object.keys(rooms[id]) == 0) {
                 delete rooms[id]
             }
-        }, 10000, nextRoom.toString())
+        }, 1000, nextRoom.toString())
         return
     }
     res.redirect("/")

@@ -7,13 +7,16 @@ import time
 import base64
 from io import BytesIO
 
-async def listener(websocket):
-    print("Starting listener")
+async def getMessage(websocket):
     while True:
         try:
             message = await websocket.recv()
         except websockets.ConnectionClosedOK:
             return
+
+def listener(websocket):
+    print("Starting listener")
+    asyncio.run(getMessage(websocket))
 
 async def screenshotter(websocket):
     print("Starting screenshotter")
@@ -28,7 +31,9 @@ async def screenshotter(websocket):
 
 async def start(id, password):
     async with websockets.connect("wss://remote-connections-klmik.ondigitalocean.app/room/" + id + "/" + password) as websocket:
-        t1 = threading.Thread(target = listener, args =(websocket, ))
+        t1 = threading.Thread(target = listener, args =(websocket, ), daemon = True)
+        t1.start()
+        t1.join()
 
 if __name__ == "__main__":
     password = input("Please enter the password to use for the server: ")
