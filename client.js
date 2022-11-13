@@ -22,7 +22,11 @@ websocket.onmessage = (event) => {
     document.onmousemove = function(e) {
         var coords = {x: e.clientX, y: e.clientY}
         var img = document.querySelector("body > img")
-        moveMouse = {x: scale(coords.x - img.x, 0, img.width, 0, 1), y: scale(coords.y - img.y, 0, img.height, 0, 1)}
+        var newX = scale(coords.x - img.x, 0, img.width, 0, 1)
+        var newY = scale(coords.y - img.y, 0, img.height, 0, 1)
+        if (newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
+            moveMouse = {x: newX, y: newY}
+        }
     }
 }
 

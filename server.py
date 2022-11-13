@@ -9,6 +9,7 @@ from io import BytesIO
 import json
 
 lastMouse = {}
+pyautogui.MINIMUM_DURATION = 0.08
 
 async def start(id, password):
     global lastMouse
@@ -18,8 +19,8 @@ async def start(id, password):
                 message = json.loads(await websocket.recv())
                 screenSize = pyautogui.size()
                 if lastMouse != message["mouse"]:
-                    newCoords = (message["mouse"]["x"] * screenSize.width, message["mouse"]["y"] * screenSize.height)
-                    print("Mouse moved to " + str(newCoords))
+                    newCoords = {x: message["mouse"]["x"] * screenSize.width, y: message["mouse"]["y"] * screenSize.height}
+                    pyautogui.moveTo(newCoords["x"], newCoords["y"], pyautogui.MINIMUM_DURATION)
                 lastMouse = message["mouse"]
                 img = pyautogui.screenshot()
                 buffered = BytesIO()
