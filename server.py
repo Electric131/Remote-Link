@@ -19,7 +19,7 @@ async def start(id, password):
                 message = json.loads(await websocket.recv())
                 screenSize = pyautogui.size()
                 if lastMouse != message["mouse"]:
-                    newCoords = {x: message["mouse"]["x"] * screenSize.width, y: message["mouse"]["y"] * screenSize.height}
+                    newCoords = {"x": message["mouse"]["x"] * screenSize.width, "y": message["mouse"]["y"] * screenSize.height}
                     pyautogui.moveTo(newCoords["x"], newCoords["y"], pyautogui.MINIMUM_DURATION)
                 lastMouse = message["mouse"]
                 img = pyautogui.screenshot()
