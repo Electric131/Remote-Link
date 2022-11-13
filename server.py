@@ -25,7 +25,6 @@ async def start(id, password):
                 buffered = BytesIO()
                 img.save(buffered, format="JPEG")
                 img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                print("Sending image")
                 await websocket.send(img_str)
             except:
                 continue
