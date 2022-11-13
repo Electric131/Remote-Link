@@ -1,17 +1,22 @@
 import asyncio
 import websockets
 import requests
-from multiprocessing import Process
+import threading
 import pyautogui
 import time
 import base64
 from io import BytesIO
 
-def sendMessage(socket, message):
-    print(socket)
-    pass
+async def listener(websocket):
+    print("Starting listener")
+    while True:
+        try:
+            message = await websocket.recv()
+        except websockets.ConnectionClosedOK:
+            return
 
-def screenshots():
+async def screenshotter(websocket):
+    print("Starting screenshotter")
     while True:
         img = pyautogui.screenshot()
         buffered = BytesIO()
@@ -19,27 +24,15 @@ def screenshots():
         img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
         sendMessage(img_str)
         time.sleep((1/1000) * 10000)
+        await handler(websocket)
 
-async def handler(websocket):
-    while True:
-        try:
-            message = await websocket.recv()
-        except websockets.ConnectionClosedOK:
-            break
-        print(message)
-
-async def main(password):
-    print("Finding an open room to connect to...")
-    id = requests.get('https://remote-connections-klmik.ondigitalocean.app/newRoom/').text
-    print("Hosting room #" + id + " with password: " + password)
+async def start(id, password):
     async with websockets.connect("wss://remote-connections-klmik.ondigitalocean.app/room/" + id + "/" + password) as websocket:
-        p = Process(target=screenshots, args=(websocket,))
-        p.daemon = True
-        p.start()
-        p.join()
-        while True:
-            pass
+        t1 = threading.Thread(target = listener, args =(websocket, ))
 
 if __name__ == "__main__":
     password = input("Please enter the password to use for the server: ")
-    asyncio.run(main(password))
+    print("Finding an open room to connect to...")
+    id = requests.get('https://remote-connections-klmik.ondigitalocean.app/newRoom/').text
+    print("Hosting room #" + id + " with password: " + password)
+    asyncio.run(start(id, password))
