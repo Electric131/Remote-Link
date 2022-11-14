@@ -52,16 +52,23 @@ wss.on('connection', function (ws, req) {
         ws.close()
         return
     }
-    
-    if (Object.keys(rooms[id]).length == 0) {
-        rooms[id].password = password
-        rooms[id].host = ws
-    }
-    
+
     if (!(id in connections)) {
         connections[id] = []
     }
-    connections[id].push({socket: ws, valid: password == rooms[id].password})
+    
+    if (Object.keys(rooms[id]).length == 0) {
+        console.log("Room #" + id + " > " + "Host has connected.")
+        rooms[id].password = password
+        rooms[id].host = ws
+        connections[id].push({socket: ws, valid: true})
+    }else {
+        if (password == rooms[id].password) {
+            connections[id].push({socket: ws, valid: true})
+        }else {
+            ws.close()
+        }
+    }
 
     ws.on('close', function () {
         connections[id] = connections[id].filter(socketData => socketData.socket !== ws)
@@ -69,6 +76,7 @@ wss.on('connection', function (ws, req) {
             delete connections[id]
         }
         if (id in rooms && ws == rooms[id].host) {
+            console.log("Room #" + id + " > " + "Host has disconnected.")
             delete rooms[id]
             if (id in connections) {
                 for (const socketData of connections[id]) {
@@ -80,10 +88,10 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
-        for (const socketData of connections[id]) {
-            if (socketData.socket != ws && socketData.valid) {
-                socketData.socket.send(message)
-            }
+        if (ws != rooms[id].host) {
+            rooms[id].host.send(message)
+        }else if (connects[id].length > 1) {
+            connections[id][1].send(message)
         }
     });
 });

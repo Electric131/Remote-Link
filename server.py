@@ -11,6 +11,22 @@ import json
 lastMouse = {}
 pyautogui.MINIMUM_DURATION = 0.08
 
+def handleEvent(event):
+    eventType = event["type"]
+    action = event["action"]
+    extra = event["extra"]
+    if eventType == "mouse":
+        clickTypes = ["left", "middle", "right"]
+        if action == "down":
+            pyautogui.mouseDown(button = clickTypes[extra - 1])
+        elif action == "up":
+            pyautogui.mouseUp(button = clickTypes[extra - 1])
+    elif eventType == "key":
+        if action == "down":
+            pyautogui.keyDown(extra)
+        elif action == "up":
+            pyautogui.keyUp(extra)
+
 async def start(id, password):
     global lastMouse
     async with websockets.connect("wss://remote-connections-klmik.ondigitalocean.app/room/" + id + "/" + password) as websocket:
@@ -21,12 +37,14 @@ async def start(id, password):
                 if lastMouse != message["mouse"] and "x" in message["mouse"] and "y" in message["mouse"]:
                     newCoords = {"x": message["mouse"]["x"] * screenSize.width, "y": message["mouse"]["y"] * screenSize.height}
                     pyautogui.moveTo(newCoords["x"], newCoords["y"], pyautogui.MINIMUM_DURATION)
+                for event in message["events"]:
+                    handleEvent(event)
                 lastMouse = message["mouse"]
                 img = pyautogui.screenshot()
                 buffered = BytesIO()
                 img.save(buffered, format="JPEG")
                 img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                await websocket.send(img_str)
+                await websocket.send("img64=" + img_str)
             except:
                 continue
 
