@@ -48,6 +48,7 @@ wss.on('connection', function (ws, req) {
     const password = groups[2]
     
     if (!(id in rooms)) {
+        console.log("Room #" + id + " > " + "Attempt to connect to closed room.")
         ws.close()
         return
     }
@@ -62,9 +63,11 @@ wss.on('connection', function (ws, req) {
         rooms[id].host = ws
         connections[id].push({socket: ws, valid: true})
     }else {
-        if (password == rooms[id].password) {
+        if (password == rooms[id].password && connections[id]) {
+            console.log("Room #" + id + " > " + "Client has connected.")
             connections[id].push({socket: ws, valid: true})
         }else {
+            console.log("Room #" + id + " > " + "Login attempt made with invalid password or max connections.")
             ws.close()
         }
     }
@@ -77,11 +80,12 @@ wss.on('connection', function (ws, req) {
         if (id in rooms && ws == rooms[id].host) {
             console.log("Room #" + id + " > " + "Host has disconnected.")
             delete rooms[id]
-            if (id in connections) {
-                for (const socketData of connections[id]) {
-                    socketData.socket.close()
-                }
+            console.log("Room #" + id + " > " + "Closing connected clients.")
+            for (const socketData of connections[id]) {
+                socketData.socket.close()
             }
+        }else {
+            console.log("Room #" + id + " > " + "Client has disconnected.")
         }
     });
 
