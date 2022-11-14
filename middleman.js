@@ -63,7 +63,7 @@ wss.on('connection', function (ws, req) {
         rooms[id].host = ws
         connections[id].push({socket: ws, valid: true})
     }else {
-        if (password == rooms[id].password && connections[id]) {
+        if (password == rooms[id].password && connections[id].length == 1) {
             console.log("Room #" + id + " > " + "Client has connected.")
             connections[id].push({socket: ws, valid: true})
         }else {
