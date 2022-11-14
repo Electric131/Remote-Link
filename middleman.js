@@ -5,7 +5,6 @@ const path = require('path');
 const { createServer } = require('http');
 
 const WebSocket = require('ws');
-const { WebSocketServer } = require('ws');
 
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
