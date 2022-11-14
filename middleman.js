@@ -94,7 +94,7 @@ wss.on('connection', function (ws, req) {
         if (ws != rooms[id].host) {
             rooms[id].host.send(message)
         }else if (connections[id].length > 1) {
-            connections[id][1].send(message)
+            connections[id][1].socket.send(message)
         }
     });
 });
