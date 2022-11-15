@@ -4,13 +4,29 @@ const websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.a
 
 var eventList = []
 var moveMouse = {}
+var lastMouse = {}
 var downKeys = []
 var countWithoutMessages = 0
+var killed = false
 
 var lastMsg = Date.now()
 
 function scale (number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+}
+
+function checkValidEvent() {
+    if (lastMouse.x >= 0 && lastMouse.x <= 1 && lastMouse.y >= 0 && lastMouse.y <= 1) {
+        return true
+    }
+    return false
+}
+
+function styleButton(button) {
+    button.style.position = "absolute"
+    button.style.scale = "2"
+    button.style.zindex = "5"
+    return button
 }
 
 document.oncontextmenu = function(e) { return false }
@@ -20,25 +36,27 @@ document.onmousemove = function(e) {
     if (img) {
         var newX = scale(coords.x - img.x, 0, img.width, 0, 1)
         var newY = scale(coords.y - img.y, 0, img.height, 0, 1)
+        lastMouse = {x: newX, y: newY}
         if (newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
             moveMouse = {x: newX, y: newY}
         }
     }
 }
-document.onmousedown = function(e) { eventList.push({type: "mouse", action: "down", extra: e.which}) }
-document.onmouseup = function(e) { eventList.push({type: "mouse", action: "up", extra: e.which}) }
+document.onmousedown = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "mouse", action: "down", extra: e.which}) }
+document.onmouseup = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "mouse", action: "up", extra: e.which}) }
 document.onkeydown = function(e) {
+    if (!checkValidEvent()) { return };
     if (!(e.key in downKeys)) {
         eventList.push({type: "key", action: "down", extra: e.key})
         downKeys.push(e.key)
     }
 }
-document.onkeyup = function(e) { eventList.push({type: "key", action: "up", extra: e.key}) }
+document.onkeyup = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "key", action: "up", extra: e.key}) }
 
 websocket.onopen = (event) => {
     setInterval(function(e) {
         countWithoutMessages++
-        if (countWithoutMessages > 50) {
+        if (countWithoutMessages > 50 && !killed) {
             document.body.innerHTML = `<h1>Server has stopped responding</h1>`
         }
         if (websocket.readyState == WebSocket.OPEN) {
@@ -46,26 +64,46 @@ websocket.onopen = (event) => {
             eventList = []
             downKeys = []
         }
-    }, 1)
+    }, 100)
+    websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
 };
 
 websocket.onclose = (event) => {
+    killed = true
     document.body.innerHTML = `<h1>Server is closed</h1>`
 }
 
 websocket.onmessage = (event) => {
-    if (event.data.startsWith("img64=")) {
-        countWithoutMessages = 0
-        var img = document.querySelector("body > img")
-        console.log(Date.now() - lastMsg)
-        lastMsg = Date.now()
-        // if (!img) {
-        //     document.body.innerHTML = `<img src="data:image/png;base64,${event.data.split("=")[1]}" />`
-        //     document.querySelector("body > img").style.maxWidth = "100%"
-        //     document.querySelector("body > img").style.maxHeight = "100%"
-        // }else {
-        //     img.src = `data:image/png;base64,${event.data.split("=")[1]}`
-        // }
+    countWithoutMessages = 0
+    var img = document.querySelector("body > img")
+    document.head.innerHTML = `<title>Unblockable | UPS: ${(1000 / (Date.now() - lastMsg)).toFixed(1)}</title>`
+    lastMsg = Date.now()
+    if (!img) {
+        document.body.innerHTML = `<img src="data:image/png;base64,${event.data}" />`
+        let winBtn = document.createElement("button")
+        winBtn.innerHTML = "Windows"
+        winBtn = styleButton(winBtn)
+        winBtn.id = "windows"
+        winBtn.style.top = "15"
+        winBtn.style.right = "40"
+        winBtn.onclick = function(e) { eventList.push({type: "key", action: "click", extra: "win"}) }
+        document.body.appendChild(winBtn);
+        let f11Btn = document.createElement("button")
+        f11Btn.innerHTML = "F11"
+        f11Btn = styleButton(f11Btn)
+        f11Btn.id = "f11"
+        f11Btn.style.top = "60"
+        f11Btn.style.right = "25"
+        f11Btn.onclick = function(e) { eventList.push({type: "key", action: "click", extra: "f11"}) }
+        document.body.appendChild(f11Btn)
+        img = document.querySelector("body > img")
+        img.style.maxWidth = "100%"
+        img.style.maxHeight = "100%"
+        img.style.left = "0px"
+        img.style.top = "0px"
+        img.style.position = "absolute"
+    }else {
+        img.src = `data:image/png;base64,${event.data}`
     }
 }
 

@@ -9,6 +9,8 @@ import base64
 from io import BytesIO
 import json
 
+pyautogui.FAILSAFE = False # Wee woo! Failsafe goes bye bye!!!!
+
 lastMouse = {}
 pyautogui.MINIMUM_DURATION = 0.01
 
@@ -27,6 +29,8 @@ def handleEvent(event):
             pydirectinput.keyDown(extra)
         elif action == "up":
             pydirectinput.keyUp(extra)
+        elif action == "click":
+            pyautogui.press(extra)
 
 async def start(id, password):
     global lastMouse
@@ -45,7 +49,7 @@ async def start(id, password):
                 buffered = BytesIO()
                 img.save(buffered, format="JPEG")
                 img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                await websocket.send("img64=" + img_str)
+                await websocket.send(img_str)
             except Exception as error:
                 raise(error)
                 continue
