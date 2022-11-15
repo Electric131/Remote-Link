@@ -1,10 +1,8 @@
 import asyncio
 import websockets
 import requests
-import threading
 import pyautogui
 import pydirectinput
-import time
 import base64
 from io import BytesIO
 import json
