@@ -7,6 +7,8 @@ var moveMouse = {}
 var downKeys = []
 var countWithoutMessages = 0
 
+var lastMsg = Date.now()
+
 function scale (number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
@@ -44,15 +46,26 @@ websocket.onopen = (event) => {
             eventList = []
             downKeys = []
         }
-    }, 100)
+    }, 1)
 };
+
+websocket.onclose = (event) => {
+    document.body.innerHTML = `<h1>Server is closed</h1>`
+}
 
 websocket.onmessage = (event) => {
     if (event.data.startsWith("img64=")) {
         countWithoutMessages = 0
-        document.body.innerHTML = `<img src="data:image/png;base64,${event.data.split("=")[1]}" />`
-        document.querySelector("body > img").style.maxWidth = "100%"
-        document.querySelector("body > img").style.maxHeight = "100%"
+        var img = document.querySelector("body > img")
+        console.log(Date.now() - lastMsg)
+        lastMsg = Date.now()
+        // if (!img) {
+        //     document.body.innerHTML = `<img src="data:image/png;base64,${event.data.split("=")[1]}" />`
+        //     document.querySelector("body > img").style.maxWidth = "100%"
+        //     document.querySelector("body > img").style.maxHeight = "100%"
+        // }else {
+        //     img.src = `data:image/png;base64,${event.data.split("=")[1]}`
+        // }
     }
 }
 

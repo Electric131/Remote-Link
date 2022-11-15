@@ -3,13 +3,14 @@ import websockets
 import requests
 import threading
 import pyautogui
+import pydirectinput
 import time
 import base64
 from io import BytesIO
 import json
 
 lastMouse = {}
-pyautogui.MINIMUM_DURATION = 0.08
+pyautogui.MINIMUM_DURATION = 0.01
 
 def handleEvent(event):
     eventType = event["type"]
@@ -23,9 +24,9 @@ def handleEvent(event):
             pyautogui.mouseUp(button = clickTypes[extra - 1])
     elif eventType == "key":
         if action == "down":
-            pyautogui.keyDown(extra)
+            pydirectinput.keyDown(extra)
         elif action == "up":
-            pyautogui.keyUp(extra)
+            pydirectinput.keyUp(extra)
 
 async def start(id, password):
     global lastMouse
@@ -45,7 +46,8 @@ async def start(id, password):
                 img.save(buffered, format="JPEG")
                 img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
                 await websocket.send("img64=" + img_str)
-            except:
+            except Exception as error:
+                raise(error)
                 continue
 
 if __name__ == "__main__":

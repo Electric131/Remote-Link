@@ -91,7 +91,7 @@ wss.on('connection', function (ws, req) {
 
     ws.on('message', function(message) {
         message = message.toString()
-        if (ws != rooms[id].host) {
+        if (id in rooms && ws != rooms[id].host) {
             rooms[id].host.send(message)
         }else if (connections[id].length > 1) {
             connections[id][1].socket.send(message)
