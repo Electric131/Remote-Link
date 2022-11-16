@@ -1,6 +1,6 @@
 const roomID = prompt("Enter the room ID")
 const roomPassword = prompt("Enter the room password")
-const websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.app/room/" + roomID + "/" + roomPassword);
+connect()
 
 var eventList = []
 var moveMouse = {}
@@ -25,10 +25,11 @@ function checkValidEvent() {
 function styleButton(button) {
     button.style.position = "absolute"
     button.style.scale = "2"
-    button.style.zindex = "5"
+    button.style.zIndex = "-1"
     return button
 }
 
+document.ondragstart = function(e) { return false }
 document.oncontextmenu = function(e) { return false }
 document.onmousemove = function(e) {
     var coords = {x: e.clientX, y: e.clientY}
@@ -53,60 +54,67 @@ document.onkeydown = function(e) {
 }
 document.onkeyup = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "key", action: "up", extra: e.key}) }
 
-websocket.onopen = (event) => {
-    setInterval(function(e) {
-        countWithoutMessages++
-        if (countWithoutMessages > 50 && !killed) {
-            document.body.innerHTML = `<h1>Server has stopped responding</h1>`
-        }
-        if (websocket.readyState == WebSocket.OPEN) {
-            websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
-            eventList = []
-            downKeys = []
-        }
-    }, 100)
-    websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
-};
+function connect() {
 
-websocket.onclose = (event) => {
-    killed = true
-    document.body.innerHTML = `<h1>Server is closed</h1>`
-}
+    const websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.app/room/" + roomID + "/" + roomPassword);
 
-websocket.onmessage = (event) => {
-    countWithoutMessages = 0
-    var img = document.querySelector("body > img")
-    document.head.innerHTML = `<title>Unblockable | UPS: ${(1000 / (Date.now() - lastMsg)).toFixed(1)}</title>`
-    lastMsg = Date.now()
-    if (!img) {
-        document.body.innerHTML = `<img src="data:image/png;base64,${event.data}" />`
-        let winBtn = document.createElement("button")
-        winBtn.innerHTML = "Windows"
-        winBtn = styleButton(winBtn)
-        winBtn.id = "windows"
-        winBtn.style.top = "15"
-        winBtn.style.right = "40"
-        winBtn.onclick = function(e) { eventList.push({type: "key", action: "click", extra: "win"}) }
-        document.body.appendChild(winBtn);
-        let f11Btn = document.createElement("button")
-        f11Btn.innerHTML = "F11"
-        f11Btn = styleButton(f11Btn)
-        f11Btn.id = "f11"
-        f11Btn.style.top = "60"
-        f11Btn.style.right = "25"
-        f11Btn.onclick = function(e) { eventList.push({type: "key", action: "click", extra: "f11"}) }
-        document.body.appendChild(f11Btn)
-        img = document.querySelector("body > img")
-        img.style.maxWidth = "100%"
-        img.style.maxHeight = "100%"
-        img.style.left = "0px"
-        img.style.top = "0px"
-        img.style.position = "absolute"
-    }else {
-        img.src = `data:image/png;base64,${event.data}`
+    websocket.onopen = (event) => {
+        setInterval(function(e) {
+            countWithoutMessages++
+            if (countWithoutMessages > 50 && !killed) {
+                document.body.innerHTML = `<h1>Server has stopped responding temporarily</h1>`
+            }
+            if (websocket.readyState == WebSocket.OPEN) {
+                websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
+                eventList = []
+                downKeys = []
+            }
+        }, 100)
+        websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
+    };
+
+    websocket.onclose = (event) => {
+        killed = true
+        document.body.innerHTML = `<h1>Server is closed</h1><button>Retry Connection</button>`
+        document.querySelector("body > button").onclick = function(e) { document.body.innerHTML = ""; connect() }
     }
-}
 
-websocket.addEventListener("error", (event) => {
-  console.log("WebSocket error: ", event);
-});
+    websocket.onmessage = (event) => {
+        countWithoutMessages = 0
+        var img = document.querySelector("body > img")
+        document.head.innerHTML = `<title>Unblockable | UPS: ${(1000 / (Date.now() - lastMsg)).toFixed(1)}</title>`
+        lastMsg = Date.now()
+        if (!img) {
+            document.body.innerHTML = `<img src="data:image/png;base64,${event.data}" />`
+            let winBtn = document.createElement("button")
+            winBtn.innerHTML = "Windows"
+            winBtn = styleButton(winBtn)
+            winBtn.id = "windows"
+            winBtn.style.top = "15"
+            winBtn.style.right = "40"
+            winBtn.onclick = function(e) { eventList.push({type: "key", action: "click", extra: "win"}) }
+            document.body.appendChild(winBtn);
+            let f11Btn = document.createElement("button")
+            f11Btn.innerHTML = "F11"
+            f11Btn = styleButton(f11Btn)
+            f11Btn.id = "f11"
+            f11Btn.style.top = "60"
+            f11Btn.style.right = "25"
+            f11Btn.onclick = function(e) { eventList.push({type: "key", action: "click", extra: "f11"}) }
+            document.body.appendChild(f11Btn)
+            img = document.querySelector("body > img")
+            img.style.maxWidth = "100%"
+            img.style.maxHeight = "100%"
+            img.style.left = "0px"
+            img.style.top = "0px"
+            img.style.position = "absolute"
+        }else {
+            img.src = `data:image/png;base64,${event.data}`
+        }
+    }
+
+    websocket.addEventListener("error", (event) => {
+    console.log("WebSocket error: ", event);
+    });
+
+}

@@ -23,10 +23,12 @@ def handleEvent(event):
         elif action == "up":
             pyautogui.mouseUp(button = clickTypes[extra - 1])
     elif eventType == "key":
+        if extra.startswith("Arrow"):
+            extra = extra.strip("Arrow")
         if action == "down":
-            pydirectinput.keyDown(extra)
+            pydirectinput.keyDown(extra.lower())
         elif action == "up":
-            pydirectinput.keyUp(extra)
+            pydirectinput.keyUp(extra.lower())
         elif action == "click":
             pyautogui.press(extra)
 
