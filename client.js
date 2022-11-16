@@ -4,10 +4,11 @@ connect()
 
 var eventList = []
 var moveMouse = {}
-var lastMouse = {}
+var lastMouse = {x: 0.5, y: 0.5}
 var downKeys = []
 var countWithoutMessages = 0
 var killed = false
+var mouseMode = "default"
 
 var lastMsg = Date.now()
 
@@ -37,10 +38,12 @@ document.onmousemove = function(e) {
     if (img) {
         var newX = scale(coords.x - img.x, 0, img.width, 0, 1)
         var newY = scale(coords.y - img.y, 0, img.height, 0, 1)
-        lastMouse = {x: newX, y: newY}
-        if (newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
+        if (mouseMode == "normal" && newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
             moveMouse = {x: newX, y: newY}
+        }else if (mouseMode == "firstperson" && newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
+            mouseMove = {x: newX - lastMouse.x + 0.5, y: newY - lastMouse.y + 0.5}
         }
+        lastMouse = {x: newX, y: newY}
     }
 }
 document.onmousedown = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "mouse", action: "down", extra: e.which}) }
@@ -102,6 +105,14 @@ function connect() {
             f11Btn.style.right = "25"
             f11Btn.onclick = function(e) { eventList.push({type: "key", action: "click", extra: "f11"}) }
             document.body.appendChild(f11Btn)
+            let firstPersonBtn = document.createElement("button")
+            firstPersonBtn.innerHTML = "First Person"
+            firstPersonBtn = styleButton(firstPersonBtn)
+            firstPersonBtn.id = "firstPerson"
+            firstPersonBtn.style.top = "105"
+            firstPersonBtn.style.right = "50"
+            firstPersonBtn.onclick = function(e) {  }
+            document.body.appendChild(firstPersonBtn)
             img = document.querySelector("body > img")
             img.style.maxWidth = "100%"
             img.style.maxHeight = "100%"
