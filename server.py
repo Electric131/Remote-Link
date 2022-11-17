@@ -6,6 +6,7 @@ import pydirectinput
 import base64
 from io import BytesIO
 import json
+import time
 
 pyautogui.FAILSAFE = False # Wee woo! Failsafe goes bye bye!!!!
 
@@ -51,8 +52,12 @@ async def start(id, password):
                 img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
                 await websocket.send(img_str)
             except Exception as error:
-                raise(error)
-                continue
+                print(error)
+                break
+        print("Attempting reconnect in 60s.")
+        time.sleep(60)
+        print("Attempting to reconnect...")
+        start(id, password)
 
 if __name__ == "__main__":
     password = input("Please enter the password to use for the server: ")

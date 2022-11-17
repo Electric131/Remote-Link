@@ -8,7 +8,7 @@ var lastMouse = {x: 0.5, y: 0.5}
 var downKeys = []
 var countWithoutMessages = 0
 var killed = false
-var mouseMode = "default"
+var mouseMode = "normal"
 
 var lastMsg = Date.now()
 
@@ -26,7 +26,6 @@ function checkValidEvent() {
 function styleButton(button) {
     button.style.position = "absolute"
     button.style.scale = "2"
-    button.style.zIndex = "-1"
     return button
 }
 
@@ -41,7 +40,7 @@ document.onmousemove = function(e) {
         if (mouseMode == "normal" && newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
             moveMouse = {x: newX, y: newY}
         }else if (mouseMode == "firstperson" && newX >= 0 && newX <= 1 && newY >= 0 && newY <= 1) {
-            mouseMove = {x: newX - lastMouse.x + 0.5, y: newY - lastMouse.y + 0.5}
+            moveMouse = {x: (newX - lastMouse.x) * 50 + 0.5, y: (newY - lastMouse.y) * 50 + 0.5}
         }
         lastMouse = {x: newX, y: newY}
     }
@@ -111,7 +110,7 @@ function connect() {
             firstPersonBtn.id = "firstPerson"
             firstPersonBtn.style.top = "105"
             firstPersonBtn.style.right = "50"
-            firstPersonBtn.onclick = function(e) {  }
+            firstPersonBtn.onclick = function(e) { (mouseMode == "normal") ? mouseMode = "firstperson" : mouseMode = "normal" }
             document.body.appendChild(firstPersonBtn)
             img = document.querySelector("body > img")
             img.style.maxWidth = "100%"
