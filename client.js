@@ -26,6 +26,7 @@ function checkValidEvent() {
 function styleButton(button) {
     button.style.position = "absolute"
     button.style.scale = "2"
+    button.style.zIndex = "-1"
     return button
 }
 
