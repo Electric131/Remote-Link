@@ -9,6 +9,7 @@ var downKeys = []
 var countWithoutMessages = 0
 var killed = false
 var mouseMode = "normal"
+var lastImage = ""
 
 var lastMsg = Date.now()
 
@@ -71,6 +72,7 @@ function connect() {
                 websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
                 eventList = []
                 downKeys = []
+                document.querySelector("body > img").src = `data:image/png;base64,${lastImage}`
             }
         }, 100)
         websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
@@ -120,7 +122,7 @@ function connect() {
             img.style.top = "0px"
             img.style.position = "absolute"
         }else {
-            img.src = `data:image/png;base64,${event.data}`
+            lastImage = event.data
         }
     }
 
