@@ -81,8 +81,10 @@ wss.on('connection', function (ws, req) {
             console.log("Room #" + id + " > " + "Host has disconnected.")
             delete rooms[id]
             console.log("Room #" + id + " > " + "Closing connected clients.")
-            for (const socketData of connections[id]) {
-                socketData.socket.close()
+            if (id in connections) {
+                for (const socketData of connections[id]) {
+                    socketData.socket.close()
+                }
             }
         }else {
             console.log("Room #" + id + " > " + "Client has disconnected.")

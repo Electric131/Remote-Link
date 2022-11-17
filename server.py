@@ -57,7 +57,10 @@ async def start(id, password):
         print("Attempting reconnect in 60s.")
         time.sleep(60)
         print("Attempting to reconnect...")
-        start(id, password)
+        print("Finding an open room to connect to...")
+        id = requests.get('https://remote-connections-klmik.ondigitalocean.app/newRoom/').text
+        print("Reconnected to room #" + id + " with password: " + password)
+        await start(id, password)
 
 if __name__ == "__main__":
     password = input("Please enter the password to use for the server: ")
