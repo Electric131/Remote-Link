@@ -1,18 +1,44 @@
 'use strict';
 
 const express = require('express');
+const busboy = require('connect-busboy');
+const fileUpload = require("express-fileupload");
 const path = require('path');
 const { createServer } = require('http');
+const fs = require('fs');
 
 const WebSocket = require('ws');
 
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
+app.use(fileUpload());
+app.use(busboy());
 
 var connections = {}
 var rooms = {}
+var tempfiles = {}
+
+function renderPage(path, vars = {}) {
+    return new Promise((res, rej) => {
+        fs.readFile(path, 'utf8', (err, data) => {
+            if (err) { console.log(err) }
+            // /\${{(\S+)}}/gm.matchAll(data)
+            let matches = data.matchAll(/\${{(\S+)}}/gm)
+            for (const match of matches) {
+                data = data.replace(`$\{{${match[1]}}\}`, vars[match[1]])
+            }
+            res(data)
+        })
+    })
+}
 
 app.all('*', function (req, res) {
+    const allowed = [
+        {type: "path", id: "uploadfile", names: ["uploadfile", "uploadfile.html"]},
+        {type: "path", id: "upload", names: ["upload"]},
+        {type: "input", id: "uploads-file", names: ["uploads"]},
+        {type: "path", id: "uploads-view", names: ["uploads"]}
+    ]
     if (req.url == "/newRoom/") {
         var nextRoom = 1
         for (const roomID of Object.keys(rooms)) {
@@ -29,6 +55,94 @@ app.all('*', function (req, res) {
                 delete rooms[id]
             }
         }, 1000, nextRoom.toString())
+        return
+    }
+    let passed = []
+    let inputs = {}
+    allowed.map(e => {
+        switch(e.type) {
+            case "path":
+                for (const name of e.names) {
+                    let pathregex = new RegExp(`^\/${name}\/?(\\?[=\\S]+)?$`, 'g')
+                    if (pathregex.test(req.url)) {
+                        passed.push(e.id)
+                        break
+                    }
+                }
+                break
+            case "input":
+                for (const name of e.names) {
+                    let pathregex = new RegExp(`^\/${name}\/([^\\s+\/]+)\/?$`, 'g')
+                    let matches = req.url.matchAll(pathregex)
+                    for (const match of matches) {
+                        if (!inputs[e.id]) {
+                            inputs[e.id] = []
+                        }
+                        inputs[e.id].push(match[1])
+                    }
+                    if (inputs[e.id]) {
+                        passed.push(e.id)
+                    }
+                    break
+                }
+                break
+            default:
+                break
+        }
+    })
+    if (passed.includes("uploads-view")) {
+        res.redirect("/upload")
+        return
+    }
+    if (passed.includes("uploads-file") && inputs["uploads-file"]) {
+        let file = inputs["uploads-file"]
+        if (fs.existsSync("./public/downloaded-files/" + file)) {
+            renderPage('public/view-file.html', {finalTime: tempfiles[file], filename: file}).then(data => {
+                res.send(data)
+            })
+        } else {
+            res.redirect("/")
+        }
+        return
+    }
+    if (passed.includes("uploadfile")) {
+        let success = false
+        if (req.method == "POST") {
+            if (req.files && req.files.filename) {
+                let name = req.files.filename.name
+                name = name.replaceAll(" ", "-")
+                let path = "./public/downloaded-files/" + name
+                req.files.filename.mv(path).then(file => {})
+                tempfiles[name] = new Date().getTime() + 60000 * 5
+                setTimeout(function(filepath){
+                    fs.unlink(filepath, err => {})
+                }, 60000 * 5, path)
+                success = true
+                res.redirect("/upload?state=success&filename=" + encodeURIComponent(name))
+            }
+            // res.download() for downloads after
+        }
+        if (!success) {
+            res.redirect("/upload?state=fail")
+        }
+        return
+    }
+    if (passed.includes("upload")) {
+        if (req.query && req.query.state) {
+            if (req.query.state == "success" && req.query.filename) {
+                renderPage('public/upload.html', {header: `File Uploaded Successfully!`, info: `Uploaded as "${req.query.filename}"\nView at: <a href="https://remote-connections-klmik.ondigitalocean.app/uploads/${req.query.filename}">${req.query.filename}</a>`}).then(data => {
+                    res.send(data)
+                })
+            } else {
+                renderPage('public/upload.html', {header: `File Upload Failed.`, info: ``}).then(data => {
+                    res.send(data)
+                })
+            }
+            return
+        }
+        renderPage('public/upload.html', {header: ``, info: ``}).then(data => {
+            res.send(data)
+        })
         return
     }
     res.redirect("/")

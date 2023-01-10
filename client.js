@@ -50,13 +50,12 @@ document.onmousemove = function(e) {
 document.onmousedown = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "mouse", action: "down", extra: e.which}) }
 document.onmouseup = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "mouse", action: "up", extra: e.which}) }
 document.onkeydown = function(e) {
-    if (!checkValidEvent()) { return };
     if (!(e.key in downKeys)) {
         eventList.push({type: "key", action: "down", extra: e.key})
         downKeys.push(e.key)
     }
 }
-document.onkeyup = function(e) { if (!checkValidEvent()) { return }; eventList.push({type: "key", action: "up", extra: e.key}) }
+document.onkeyup = function(e) { eventList.push({type: "key", action: "up", extra: e.key}) }
 
 function connect() {
 
@@ -69,13 +68,13 @@ function connect() {
                 document.body.innerHTML = `<h1>Server has stopped responding temporarily</h1>`
             }
             if (websocket.readyState == WebSocket.OPEN) {
-                websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
+                websocket.send(JSON.stringify({mouse: moveMouse, events: eventList, sentAt: Date.now()}))
                 eventList = []
                 downKeys = []
                 document.querySelector("body > img").src = `data:image/png;base64,${lastImage}`
             }
         }, 100)
-        websocket.send(JSON.stringify({mouse: moveMouse, events: eventList}))
+        websocket.send(JSON.stringify({mouse: moveMouse, events: eventList, sentAt: Date.now()}))
     };
 
     websocket.onclose = (event) => {

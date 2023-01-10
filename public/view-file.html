@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Remote Connections</title>
+    <body>
+        <h3 id="timer">
+            Time Left:
+        </h3>
+        <p>
+            <a href="./downloaded-files/${{filename}}" download="${{filename}}">
+                <button type="button">Download</button>
+            </a>
+        </p>
+        <script>
+            const goalTime = eval('${{finalTime}}')
+            function getRemaining() {
+                let time = new Date().getTime()
+                let diff = Math.floor((goalTime - time) / 1000)
+                document.getElementById("timer").innerHTML = "Time Left: " + `${Math.floor(diff / 60)}:${String("0" + diff % 60).slice(-2)}`
+            }
+            setInterval(getRemaining, 100)
+        </script>
+    </body>
+</html>
