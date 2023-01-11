@@ -18,6 +18,10 @@ var connections = {}
 var rooms = {}
 var tempfiles = {}
 
+if (!fs.existsSync("./public/downloaded-files")){
+    fs.mkdirSync("./public/downloaded-files");
+}
+
 function renderPage(path, vars = {}) {
     return new Promise((res, rej) => {
         fs.readFile(path, 'utf8', (err, data) => {
