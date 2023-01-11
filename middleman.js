@@ -91,7 +91,16 @@ app.all('*', function (req, res) {
         }
     })
     if (passed.includes("uploads-view")) {
-        res.redirect("/upload")
+        let fileList = ["None"]
+        if (Object.keys(tempfiles).length > 0) {
+            fileList = []
+            for (const filename of Object.keys(tempfiles)) {
+                fileList.push(`<a href="/uploads/${filename}">${filename}</a>`)
+            }
+        }
+        renderPage('public/uploads.html', {fileList: fileList}).then(data => {
+            res.send(data)
+        })
         return
     }
     if (passed.includes("uploads-file") && inputs["uploads-file"]) {
@@ -130,7 +139,7 @@ app.all('*', function (req, res) {
     if (passed.includes("upload")) {
         if (req.query && req.query.state) {
             if (req.query.state == "success" && req.query.filename) {
-                renderPage('public/upload.html', {header: `File Uploaded Successfully!`, info: `Uploaded as "${req.query.filename}"\nView at: <a href="https://remote-connections-klmik.ondigitalocean.app/uploads/${req.query.filename}">${req.query.filename}</a>`}).then(data => {
+                renderPage('public/upload.html', {header: `File Uploaded Successfully!`, info: `Uploaded as "${req.query.filename}"\nView at: <a href="./uploads/${req.query.filename}">${req.query.filename}</a>`}).then(data => {
                     res.send(data)
                 })
             } else {
