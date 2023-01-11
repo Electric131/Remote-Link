@@ -105,7 +105,7 @@ app.all('*', function (req, res) {
                 fileList.push(`<a href="/uploads/${filename}">${filename}</a>`)
             }
         }
-        renderPage('public/uploads.html', {fileList: fileList}).then(data => {
+        renderPage('public/uploads.html', {fileList: fileList.join("<br>")}).then(data => {
             res.send(data)
         })
         return
@@ -130,9 +130,10 @@ app.all('*', function (req, res) {
                 let path = "./public/downloaded-files/" + name
                 req.files.filename.mv(path).then(file => {})
                 tempfiles[name] = new Date().getTime() + 60000 * 5
-                setTimeout(function(filepath){
+                setTimeout(function(filepath, name){
                     fs.unlink(filepath, err => {})
-                }, 60000 * 5, path)
+                    delete tempfiles[name]
+                }, 60000 * 5, path, name)
                 success = true
                 res.redirect("/upload?state=success&filename=" + encodeURIComponent(name))
             }
