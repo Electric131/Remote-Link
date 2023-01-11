@@ -18,7 +18,10 @@ var connections = {}
 var rooms = {}
 var tempfiles = {}
 
-if (!fs.existsSync("./public/downloaded-files")){
+var ready = false
+if (fs.existsSync("./public/downloaded-files")){
+    fs.rm("./public/downloaded-files", { recursive: true }, e => { fs.mkdirSync("./public/downloaded-files"); })
+} else {
     fs.mkdirSync("./public/downloaded-files");
 }
 
