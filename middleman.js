@@ -44,7 +44,8 @@ app.all('*', function (req, res) {
         {type: "path", id: "uploadfile", names: ["uploadfile", "uploadfile.html"]},
         {type: "path", id: "upload", names: ["upload"]},
         {type: "input", id: "uploads-file", names: ["uploads"]},
-        {type: "path", id: "uploads-view", names: ["uploads"]}
+        {type: "path", id: "uploads-view", names: ["uploads"]},
+        {type: "input", id: "allow-downloads", names: ["downloaded-files"]}
     ]
     if (req.url == "/newRoom/") {
         var nextRoom = 1
@@ -97,6 +98,14 @@ app.all('*', function (req, res) {
                 break
         }
     })
+    if (passed.includes("allow-downloads") && inputs["allow-downloads"]) {
+        try {
+            res.sendFile("./public/downloaded-files/" + inputs["allow-downloads"])
+        } catch {
+            res.redirect("/")
+        }
+        return
+    }
     if (passed.includes("uploads-view")) {
         let fileList = ["None"]
         if (Object.keys(tempfiles).length > 0) {
