@@ -28,6 +28,8 @@ function styleButton(button) {
     button.style.position = "absolute"
     button.style.scale = "2"
     button.style.zIndex = "-1"
+    button.style.tabIndex = "-1"
+    button.style.unselectable = "on"
     return button
 }
 

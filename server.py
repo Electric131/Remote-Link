@@ -59,6 +59,7 @@ async def start(id, password):
                 if "mouse" in message and lastMouse != message["mouse"] and "x" in message["mouse"] and "y" in message["mouse"]:
                     newCoords = {"x": message["mouse"]["x"] * screenSize.width, "y": message["mouse"]["y"] * screenSize.height}
                     pyautogui.moveTo(newCoords["x"], newCoords["y"], pyautogui.MINIMUM_DURATION)
+                    pydirectinput.moveTo(int(newCoords["x"]), int(newCoords["y"]))
                 if "events" in message:
                     for event in message["events"]:
                         handleEvent(event)
