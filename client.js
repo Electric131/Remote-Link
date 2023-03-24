@@ -98,7 +98,6 @@ function connect() {
             }
         }, 100)
 
-        window.onblur = () => { websocket.close() }
 
         websocket.send(JSON.stringify({mouse: moveMouse, events: eventList, sentAt: Date.now()}))
     };
