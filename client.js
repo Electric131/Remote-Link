@@ -59,6 +59,26 @@ document.onkeydown = function(e) {
 }
 document.onkeyup = function(e) { eventList.push({type: "key", action: "up", extra: e.key}) }
 
+function getBlob(byteString, mimeString) {
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    var blob = new Blob([ab], {type: mimeString});
+    return blob;
+}
+
+let prevObjectURL = null;
+
+function loadImage(img, base64) {
+  var blob = getBlob(Buffer.from(base64, 'base64'), 'image/jpg');
+  var objectURL = URL.createObjectURL(blob);
+  img.src = objectURL;
+  URL.revokeObjectURL(prevObjectURL);
+  prevObjectURL = objectURL;
+}
+
 function connect() {
 
     const websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.app/room/" + roomID + "/" + roomPassword);
