@@ -69,7 +69,7 @@ async def start(id, password):
                     currentTime = round(time.time() * 1000)
                     timeDiff = int(int(currentTime) - int(message["sentAt"]))
                     # Optional debug to see approximate delay in ms.
-                    print("Approximate delay: " + str(str(timeDiff).zfill(4)))
+                    print("Approximate delay: " + str(str(timeDiff).zfill(5)))
                 img = pyautogui.screenshot()
                 buffered = BytesIO()
                 img.save(buffered, format="JPEG")

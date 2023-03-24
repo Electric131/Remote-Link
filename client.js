@@ -70,6 +70,7 @@ function getBlob(byteString, mimeString) {
 }
 
 let prevObjectURL = null;
+websocket = null;
 
 function loadImage(img, base64) {
   var blob = getBlob(Buffer.from(base64, 'base64'), 'image/jpg');
@@ -81,7 +82,7 @@ function loadImage(img, base64) {
 
 function connect() {
 
-    const websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.app/room/" + roomID + "/" + roomPassword);
+    websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.app/room/" + roomID + "/" + roomPassword);
 
     websocket.onopen = (event) => {
         setInterval(function(e) {
@@ -96,6 +97,9 @@ function connect() {
                 document.querySelector("body > img").src = `data:image/png;base64,${lastImage}`
             }
         }, 100)
+
+        window.onbeforeunload = () => { websocket.close() }
+
         websocket.send(JSON.stringify({mouse: moveMouse, events: eventList, sentAt: Date.now()}))
     };
 
