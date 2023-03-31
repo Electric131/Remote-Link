@@ -82,7 +82,7 @@ function loadImage(img, base64) {
 
 function connect() {
 
-    let websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.app/room/" + roomID + "/" + roomPassword);
+    var websocket = new WebSocket("wss://remote-connections-klmik.ondigitalocean.app/room/" + roomID + "/" + roomPassword);
 
     websocket.onopen = (event) => {
         setInterval(function(e) {
@@ -98,7 +98,7 @@ function connect() {
             }
         }, 100)
 
-        // window.onblur = () => { websocket.close() }
+        window.onblur = () => { websocket.close() }
 
         websocket.send(JSON.stringify({mouse: moveMouse, events: eventList, sentAt: Date.now()}))
     };
