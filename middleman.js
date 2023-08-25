@@ -173,7 +173,9 @@ app.all('*', function (req, res) {
         return
     }
     if (passed.includes("chatgpt")) {
-        renderPage('public/chatgpt.html')
+        renderPage('public/chatgpt.html').then(data => {
+            res.send(data)
+        })
     }
     res.redirect("/")
 })
