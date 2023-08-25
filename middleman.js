@@ -46,7 +46,7 @@ app.all('*', function (req, res) {
         {type: "input", id: "uploads-file", names: ["uploads"]},
         {type: "path", id: "uploads-view", names: ["uploads"]},
         {type: "input", id: "allow-downloads", names: ["downloaded-files"]},
-        {type: "path", id: "chatgpt", names: ["chat"]}
+        {type: "path", id: "chatgpt", names: ["chat", "chatgpt.html"]}
     ]
     if (req.url == "/newRoom/") {
         var nextRoom = 1
