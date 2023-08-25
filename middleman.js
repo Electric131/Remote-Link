@@ -46,7 +46,7 @@ app.all('*', function (req, res) {
         {type: "input", id: "uploads-file", names: ["uploads"]},
         {type: "path", id: "uploads-view", names: ["uploads"]},
         {type: "input", id: "allow-downloads", names: ["downloaded-files"]},
-        {type: "path", id: "chatgpt", names: ["chat", "chatgpt.html"]}
+        {type: "path", id: "chatgpt", names: ["chat"]}
     ]
     if (req.url == "/newRoom/") {
         var nextRoom = 1
@@ -176,6 +176,7 @@ app.all('*', function (req, res) {
         renderPage('public/chatgpt.html').then(data => {
             res.send(data)
         })
+        return
     }
     res.redirect("/")
 })
