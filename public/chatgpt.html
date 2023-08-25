@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <h1>
+            Welcome to Chat
+        </h1>
+        <p>
+            Enter an API key to begin, and ask a prompt. Note that this is a very bare-bones API fetcher so the UI is almost non-existant.
+            This has no knowledge of previous messages.
+        </p>
+    </head>
+    <body>
+        <label for="apiKey">API Key:</label> <input type="password" id="apiKey" value=""> <br>
+        <label for="systemPrompt">System Prompt:</label> <input type="text" id="systemPrompt" value="You are a friendly chatbot!"> <br>
+        <label for="prompt">User Prompt:</label> <input type="text" id="prompt" value="How are you?"> <br>
+        <button id="send">Send Request</button>
+        <p id="response">
+            Response will appear here.
+        </p>
+    </body>
+    <script>
+        const apiKey = document.getElementById("apiKey")
+        const systemPrompt = document.getElementById("systemPrompt")
+        const userPrompt = document.getElementById("prompt")
+        const responseBox = document.getElementById("response")
+        document.getElementById("send").onclick = async function() {
+            await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + apiKey.value
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [
+                        {
+                            role: "system",
+                            content: systemPrompt.value
+                        },
+                        {
+                            role: "user",
+                            content: userPrompt.value
+                        }
+                    ],
+                    "temperature": 0.9
+                })
+            }).then((response) => {
+                response.json().then((e) => {
+                    if (e.error) {
+                        if (e.error.message.includes("API")) {
+                            responseBox.innerHTML = "Invalid API Key"
+                            return
+                        }
+                        responseBox.innerHTML = "Unknown Error: " + e.error.message
+                    } else {
+                        if (e.choices.length > 0) {
+                            responseBox.innerHTML = e.choices[0].message.content
+                        } else {
+                            responseBox.innerHTML = "No Choices"
+                        }
+                    }
+                })
+            })
+        }
+    </script>
+</html>
